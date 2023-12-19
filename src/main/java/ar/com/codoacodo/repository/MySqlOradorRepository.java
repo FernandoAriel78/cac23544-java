@@ -23,14 +23,15 @@ public class MySqlOradorRepository implements OradorRepository {
 				//Connection con = AdministradorDeConexiones.getConnection();
 
 				// 2 - preparo sql: sql injeciton!
-				String sql = "insert into orador (nombre, apellido, tema, mail, fecha_alta) values (?,?,?,?,?)";
+				//String sql = "insert into orador (nombre, apellido, tema, mail, fecha_alta) values (?,?,?,?,?)";
+				String sql = "insert into registrar_usuarios (nombre, apellido, mail, tema, fecha_alta) values (?,?,?,?,?)";
 
 				try (Connection con = AdministradorDeConexiones.getConnection()) {
 					PreparedStatement statement = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 					statement.setString(1, orador.getNombre());
 					statement.setString(2, orador.getApellido());
-					statement.setString(3, orador.getTema());
-					statement.setString(4, orador.getMail());
+					statement.setString(3, orador.getMail());
+					statement.setString(4, orador.getTema());
 					statement.setDate(5, new java.sql.Date(DateUtils.asDate(orador.getFechaAlta()).getTime()));// tph: ver como pasar de LocalDate a
 																						// java.sql.Date
 
@@ -51,7 +52,8 @@ public class MySqlOradorRepository implements OradorRepository {
 	public Orador getById(Long id) {
 		Connection con = AdministradorDeConexiones.getConnection();
 
-		String sql = "select id, nombre, apellido, tema, mail, fecha_alta from orador where id = ?";
+		//String sql = "select id, nombre, apellido, tema, mail, fecha_alta from orador where id = ?";
+		String sql = "select id, nombre, apellido, mail, tema, fecha_alta from registrar_usuarios where id = ?";
 
 		Orador orador = null;
 		try {
@@ -63,10 +65,10 @@ public class MySqlOradorRepository implements OradorRepository {
 			if (res.next()) {
 				Long dbId = res.getLong(1);  
 				String nombre = res.getString(2);  
-				String apellido = res.getString(3);  
-				String tema = res.getString(4);  
-				String mail = res.getString(5);  
-				Date fechaAlta = res.getDate(6);   
+				String apellido = res.getString(3);
+				String mail = res.getString(4); 
+				String tema = res.getString(5);  
+				 Date fechaAlta = res.getDate(6);   
 			
 			orador = new Orador(dbId, nombre, apellido, mail, tema,DateUtils.asLocalDate(fechaAlta));
 			//LocalDate.from(fechaAlta.toInstant()));//tph: !!!	
@@ -81,7 +83,11 @@ public class MySqlOradorRepository implements OradorRepository {
 
 	@Override
 	public void update(Orador orador) {
-		String sql = "update orador "
+		/*String sql = "update orador "
+				+ "set nombre=?, apellido=?, mail=?, tema=? "
+				+ "where id = ?";*/
+		
+		String sql = "update registrar_usuarios "
 				+ "set nombre=?, apellido=?, mail=?, tema=? "
 				+ "where id = ?";
 		
@@ -105,7 +111,8 @@ public class MySqlOradorRepository implements OradorRepository {
 
 	@Override
 	public void delete(Long id) {
-		String sql = "delete from orador where id = ?";
+		//String sql = "delete from orador where id = ?";
+		String sql = "delete from registrar_usuarios where id = ?";
 		
 		//try with resources
 		try(Connection con = AdministradorDeConexiones.getConnection()) {
@@ -123,7 +130,8 @@ public class MySqlOradorRepository implements OradorRepository {
 
 
 	public List<Orador> findAll() {
-		String sql = "select id, nombre, apellido, tema, mail, fecha_alta from orador";
+		//String sql = "select id, nombre, apellido, tema, mail, fecha_alta from orador";
+		String sql = "select id, nombre, apellido, mail, tema, fecha_alta from registrar_usuarios";
 
 		List<Orador> oradores = new ArrayList<>();//se ve bien en spring!
 		
@@ -136,9 +144,9 @@ public class MySqlOradorRepository implements OradorRepository {
 			while (res.next()) {
 				Long dbId = res.getLong(1);  
 				String nombre = res.getString(2);  
-				String apellido = res.getString(3);  
-				String tema = res.getString(4);  
-				String mail = res.getString(5);  
+				String apellido = res.getString(3);
+				String mail = res.getString(4);  
+				String tema = res.getString(5);  
 				LocalDate fechaAlta = DateUtils.asLocalDate(res.getDate(6));  
 				
 				oradores.add(new Orador(dbId, nombre, apellido, mail, tema,fechaAlta));
